@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Student Portal (Centered Demo)</title>
+  <style>
+    /* --------------------------------------------------
+       GLOBAL STYLES
+    -------------------------------------------------- */
+    * {
+      box-sizing: border-box;
+      margin: 0; 
+      padding: 0;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background: url("https://assets.onecompiler.app/435rjcv45/436mgvt3n/470553271_459879827152944_8302503995595466956_n.jpg") no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+      position: relative;
+      /* Center container vertically and horizontally */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    /* Dark overlay for readability */
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0; 
+      left: 0; 
+      right: 0; 
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 0;
+    }
+    /* Centering container for all sections */
+    .container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 450px;
+      padding: 20px;
+    }
+    /* Each section */
+    .section {
+      display: none;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+      padding: 30px;
+      margin: 0 auto;
+      text-align: center;
+      animation: fadeInUp 0.8s ease-in-out;
+    }
+    .visible {
+      display: block;
+    }
+    /* Headings */
+    h1, h2 {
+      margin-bottom: 20px;
+    }
+    /* Input groups */
+    .input-group {
+      margin-bottom: 15px;
+      text-align: left;
+      margin: 0 auto;
+      width: 80%;
+      max-width: 300px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      outline: none;
+      font-size: 14px;
+    }
+    input[type="date"] {
+      color: #000;
+    }
+    textarea {
+      resize: none;
+    }
+    /* Buttons */
+    button {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 5px;
+      background: #8a65ff;
+      color: #fff;
+      cursor: pointer;
+      font-size: 14px;
+      margin-top: 5px;
+      margin-right: 5px;
+    }
+    button:hover {
+      background: #9c78ff;
+    }
+    /* Links styled as buttons */
+    .link-button {
+      background: transparent;
+      color: #ccc;
+      border: none;
+      cursor: pointer;
+      text-decoration: underline;
+      margin-left: 5px;
+    }
+    .link-button:hover {
+      color: #fff;
+    }
+    /* Error or status messages */
+    .error {
+      color: #f66;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    /* Tables (Admin) */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 10px;
+      text-align: left;
+    }
+    th {
+      background: rgba(255,255,255,0.2);
+    }
+    tr:nth-child(even) {
+      background: rgba(0,0,0,0.1);
+    }
+    /* Navigation (top-right) */
+    #nav {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      z-index: 2;
+    }
+    #nav button {
+      background: #222;
+      margin: 0 5px;
+      padding: 8px 12px;
+    }
+    #roleIndicator {
+      margin-left: 10px;
+      font-size: 14px;
+      color: #fff;
+    }
+    .hidden {
+      display: none !important;
+    }
+    /* Fade-in animation */
+    @keyframes fadeInUp {
+      0% {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    /* Footer note */
+    .footer-note {
+      text-align: center;
+      margin-top: 30px;
+      font-size: 12px;
+      color: #ccc;
+      position: relative;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation (only visible when logged in) -->
+  <div id="nav" class="hidden">
+    <button onclick="logout()">Logout</button>
+    <span id="roleIndicator"></span>
+  </div>
+  <!-- Main container -->
+  <div class="container">
+    <!-- LOGIN SECTION -->
+    <div id="loginSection" class="section visible">
+      <h1>Login</h1>
+      <div id="loginError" class="error"></div>
+      <div class="input-group">
+        <label>Email</label>
+        <input type="email" id="loginEmail" placeholder="Enter your email...">
+      </div>
+      <div class="input-group">
+        <label>Password</label>
+        <input type="password" id="loginPassword" placeholder="Enter your password...">
+      </div>
+      <div style="margin: 10px 0;">
+        <input type="checkbox" id="rememberMe"> 
+        <label for="rememberMe" style="font-weight:normal;">Remember Me</label>
+        <button class="link-button" onclick="showSection('forgotSection')">Forgot Password</button>
+      </div>
+      <button onclick="doLogin()">Log In</button>
+      <p style="margin-top: 15px;">
+        Don’t have an account? 
+        <button class="link-button" onclick="showSection('registerSection')">Register</button>
+      </p>
+    </div>
+
+    <!-- REGISTER SECTION -->
+    <div id="registerSection" class="section">
+      <h1>Register</h1>
+      <div id="registerError" class="error"></div>
+      <div class="input-group">
+        <label>Full Name</label>
+        <input type="text" id="registerFullName" placeholder="Your name">
+      </div>
+      <div class="input-group">
+        <label>Email</label>
+        <input type="email" id="registerEmail" placeholder="Your email">
+      </div>
+      <div class="input-group">
+        <label>Password</label>
+        <input type="password" id="registerPassword" placeholder="Create a password">
+      </div>
+      <div class="input-group">
+        <label>Confirm Password</label>
+        <input type="password" id="registerConfirmPassword" placeholder="Retype your password">
+      </div>
+      <button onclick="doRegister()">Register</button>
+      <button class="link-button" onclick="showSection('loginSection')">Back to Login</button>
+    </div>
+
+    <!-- FORGOT PASSWORD SECTION -->
+    <div id="forgotSection" class="section">
+      <h1>Forgot Password</h1>
+      <div id="forgotMessage" class="error"></div>
+      <div class="input-group">
+        <label>Enter your email</label>
+        <input type="email" id="forgotEmail" placeholder="Your email...">
+      </div>
+      <button onclick="doForgotPassword()">Submit</button>
+      <button class="link-button" onclick="showSection('loginSection')">Back to Login</button>
+    </div>
+
+    <!-- STUDENT DASHBOARD SECTION -->
+    <div id="studentSection" class="section">
+      <h2>Student Dashboard</h2>
+      <p>Welcome! Here you can fill or update your personal info.</p>
+      <button onclick="showSection('fillInfoSection')">Fill/Update My Info</button>
+    </div>
+
+    <!-- STUDENT FILL INFO SECTION -->
+    <div id="fillInfoSection" class="section">
+      <h2>Fill Your Info</h2>
+      <div id="fillError" class="error"></div>
+      <div class="input-group">
+        <label>Full Name</label>
+        <input type="text" id="studentFullName">
+      </div>
+      <div class="input-group">
+        <label>Birthday</label>
+        <input type="date" id="studentBirthday">
+      </div>
+      <div class="input-group">
+        <label>Sex</label>
+        <select id="studentSex">
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Grade</label>
+        <input type="text" id="studentGrade" placeholder="e.g. Grade 10">
+      </div>
+      <div class="input-group">
+        <label>Section</label>
+        <input type="text" id="studentSectionInput" placeholder="e.g. Section A">
+      </div>
+      <div class="input-group">
+        <label>LRN</label>
+        <input type="text" id="studentLRN">
+      </div>
+      <button onclick="saveStudentInfo()">Save</button>
+      <button class="link-button" onclick="showSection('studentSection')">Cancel</button>
+    </div>
+
+    <!-- ADMIN DASHBOARD SECTION -->
+    <div id="adminSection" class="section">
+      <h2>Admin Dashboard</h2>
+      <div id="adminError" class="error"></div>
+      <table id="studentsTable">
+        <thead>
+          <tr>
+            <th>Full Name</th>
+            <th>Birthday</th>
+            <th>Sex</th>
+            <th>Grade</th>
+            <th>Section</th>
+            <th>LRN</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Student rows will be dynamically inserted -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- EDIT STUDENT SECTION (ADMIN) -->
+    <div id="adminEditSection" class="section">
+      <h2>Edit Student</h2>
+      <div id="editError" class="error"></div>
+      <input type="hidden" id="editStudentId">
+      <div class="input-group">
+        <label>Full Name</label>
+        <input type="text" id="editFullName">
+      </div>
+      <div class="input-group">
+        <label>Birthday</label>
+        <input type="date" id="editBirthday">
+      </div>
+      <div class="input-group">
+        <label>Sex</label>
+        <select id="editSex">
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Grade</label>
+        <input type="text" id="editGrade">
+      </div>
+      <div class="input-group">
+        <label>Section</label>
+        <input type="text" id="editSection">
+      </div>
+      <div class="input-group">
+        <label>LRN</label>
+        <input type="text" id="editLRN">
+      </div>
+      <button onclick="updateStudent()">Update</button>
+      <button class="link-button" onclick="showSection('adminSection')">Cancel</button>
+    </div>
+
+    <!-- ADD GUIDANCE RECORD SECTION (ADMIN) -->
+    <div id="adminGuidanceSection" class="section">
+      <h2>Add Guidance Record</h2>
+      <div id="guidanceError" class="error"></div>
+      <input type="hidden" id="guidanceStudentId">
+      <div class="input-group">
+        <label>Guidance Record Details</label>
+        <textarea id="guidanceDetails" rows="4" placeholder="Enter guidance notes..." style="width:100%;"></textarea>
+      </div>
+      <button onclick="saveGuidanceRecord()">Save Record</button>
+      <button class="link-button" onclick="showSection('adminSection')">Cancel</button>
+    </div>
+
+    <div class="footer-note">
+      Demo Student Portal &copy; 2025. For illustration purposes only.
+    </div>
+  </div> <!-- End container -->
+
+  <script>
+    // --------------------------------------------------
+    // SINGLE-PAGE APP USING LOCAL / SESSION STORAGE
+    // --------------------------------------------------
+
+    /* 
+      Default admin is auto-created:
+      Email: admin@admin.com
+      Password: admin
+    */
+
+    let currentUser = null;
+
+    // On page load, ensure admin exists & check if someone is remembered
+    ensureAdminUser();
+    checkSession();
+    if (currentUser) {
+      if (currentUser.role === 'admin') {
+        showAdminDashboard();
+      } else {
+        showStudentDashboard();
+      }
+    } else {
+      showSection('loginSection');
+    }
+
+    // -------------------------------
+    // SHOW / HIDE SECTIONS
+    // -------------------------------
+    function showSection(sectionId) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+      // Hide navigation if on login, register, or forgot pages
+      if (['loginSection', 'registerSection', 'forgotSection'].includes(sectionId)) {
+        document.getElementById('nav').classList.add('hidden');
+      } else {
+        document.getElementById('nav').classList.remove('hidden');
+      }
+      document.getElementById(sectionId).classList.add('visible');
+    }
+
+    // -------------------------------
+    // LOCAL STORAGE HELPERS
+    // -------------------------------
+    function loadUsers() {
+      const data = localStorage.getItem('users');
+      return data ? JSON.parse(data) : [];
+    }
+    function saveUsers(users) {
+      localStorage.setItem('users', JSON.stringify(users));
+    }
+    function loadGuidanceRecords() {
+      const data = localStorage.getItem('guidanceRecords');
+      return data ? JSON.parse(data) : [];
+    }
+    function saveGuidanceRecords(records) {
+      localStorage.setItem('guidanceRecords', JSON.stringify(records));
+    }
+
+    // -------------------------------
+    // ENSURE ADMIN USER EXISTS
+    // -------------------------------
+    function ensureAdminUser() {
+      let users = loadUsers();
+      if (!users.find(u => u.email === 'admin@admin.com')) {
+        users.push({
+          id: generateId(),
+          full_name: 'Admin User',
+          email: 'admin@admin.com',
+          password: 'admin',
+          role: 'admin',
+          birthday: '',
+          sex: '',
+          grade: '',
+          section: '',
+          LRN: ''
+        });
+        saveUsers(users);
+      }
+    }
+
+    // -------------------------------
+    // SESSION & REMEMBER-ME
+    // -------------------------------
+    function checkSession() {
+      let userData = localStorage.getItem('loggedInUser') || sessionStorage.getItem('currentUser');
+      currentUser = userData ? JSON.parse(userData) : null;
+    }
+    function saveSession(user, remember = false) {
+      if (remember) {
+        localStorage.setItem('loggedInUser', JSON.stringify(user));
+      } else {
+        sessionStorage.setItem('currentUser', JSON.stringify(user));
+      }
+    }
+    function clearSession() {
+      localStorage.removeItem('loggedInUser');
+      sessionStorage.removeItem('currentUser');
+      currentUser = null;
+    }
+
+    // -------------------------------
+    // AUTHENTICATION
+    // -------------------------------
+    function doLogin() {
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      const remember = document.getElementById('rememberMe').checked;
+      const user = loadUsers().find(u => u.email === email && u.password === password);
+      if (!user) {
+        document.getElementById('loginError').innerText = 'Invalid credentials.';
+        return;
+      }
+      saveSession(user, remember);
+      currentUser = user;
+      document.getElementById('loginEmail').value = '';
+      document.getElementById('loginPassword').value = '';
+      document.getElementById('loginError').innerText = '';
+      if (user.role === 'admin') {
+        showAdminDashboard();
+      } else {
+        showStudentDashboard();
+      }
+    }
+    function doRegister() {
+      const fullName = document.getElementById('registerFullName').value.trim();
+      const email = document.getElementById('registerEmail').value.trim();
+      const password = document.getElementById('registerPassword').value;
+      const confirmPassword = document.getElementById('registerConfirmPassword').value;
+      if (!fullName || !email || !password) {
+        document.getElementById('registerError').style.color = '#f66';
+        document.getElementById('registerError').innerText = 'All fields are required.';
+        return;
+      }
+      if (password !== confirmPassword) {
+        document.getElementById('registerError').style.color = '#f66';
+        document.getElementById('registerError').innerText = 'Passwords do not match.';
+        return;
+      }
+      let users = loadUsers();
+      if (users.find(u => u.email === email)) {
+        document.getElementById('registerError').style.color = '#f66';
+        document.getElementById('registerError').innerText = 'Email already in use.';
+        return;
+      }
+      users.push({
+        id: generateId(),
+        full_name: fullName,
+        email: email,
+        password: password,
+        role: 'student',
+        birthday: '',
+        sex: '',
+        grade: '',
+        section: '',
+        LRN: ''
+      });
+      saveUsers(users);
+      document.getElementById('registerFullName').value = '';
+      document.getElementById('registerEmail').value = '';
+      document.getElementById('registerPassword').value = '';
+      document.getElementById('registerConfirmPassword').value = '';
+      document.getElementById('registerError').style.color = 'limegreen';
+      document.getElementById('registerError').innerText = 'Registration successful! You can now log in.';
+    }
+    function doForgotPassword() {
+      const email = document.getElementById('forgotEmail').value.trim();
+      if (!email) {
+        document.getElementById('forgotMessage').innerText = 'Please enter your email.';
+        return;
+      }
+      const user = loadUsers().find(u => u.email === email);
+      if (!user) {
+        document.getElementById('forgotMessage').innerText = 'Email not found.';
+        return;
+      }
+      document.getElementById('forgotMessage').style.color = 'limegreen';
+      document.getElementById('forgotMessage').innerText = 'A reset link would be sent to your email (demo only).';
+    }
+    function logout() {
+      clearSession();
+      showSection('loginSection');
+    }
+
+    // -------------------------------
+    // STUDENT FUNCTIONS
+    // -------------------------------
+    function showStudentDashboard() {
+      checkSession();
+      if (!currentUser || currentUser.role !== 'student') {
+        showSection('loginSection');
+        return;
+      }
+      document.getElementById('roleIndicator').innerText = 'Logged in as: Student';
+      showSection('studentSection');
+    }
+    function saveStudentInfo() {
+      checkSession();
+      if (!currentUser || currentUser.role !== 'student') {
+        showSection('loginSection');
+        return;
+      }
+      const full_name = document.getElementById('studentFullName').value.trim();
+      const birthday = document.getElementById('studentBirthday').value;
+      const sex = document.getElementById('studentSex').value;
+      const grade = document.getElementById('studentGrade').value.trim();
+      const section = document.getElementById('studentSectionInput').value.trim();
+      const LRN = document.getElementById('studentLRN').value.trim();
+      if (!full_name || !birthday || !sex || !grade || !section || !LRN) {
+        document.getElementById('fillError').innerText = 'All fields are required.';
+        return;
+      }
+      let users = loadUsers();
+      const idx = users.findIndex(u => u.id === currentUser.id);
+      if (idx === -1) {
+        document.getElementById('fillError').innerText = 'User not found.';
+        return;
+      }
+      users[idx].full_name = full_name;
+      users[idx].birthday = birthday;
+      users[idx].sex = sex;
+      users[idx].grade = grade;
+      users[idx].section = section;
+      users[idx].LRN = LRN;
+      saveUsers(users);
+      if (localStorage.getItem('loggedInUser')) {
+        localStorage.setItem('loggedInUser', JSON.stringify(users[idx]));
+      } else {
+        sessionStorage.setItem('currentUser', JSON.stringify(users[idx]));
+      }
+      document.getElementById('fillError').innerText = '';
+      document.getElementById('studentFullName').value = '';
+      document.getElementById('studentBirthday').value = '';
+      document.getElementById('studentSex').value = 'Male';
+      document.getElementById('studentGrade').value = '';
+      document.getElementById('studentSectionInput').value = '';
+      document.getElementById('studentLRN').value = '';
+      showSection('studentSection');
+    }
+
+    // -------------------------------
+    // ADMIN FUNCTIONS
+    // -------------------------------
+    function showAdminDashboard() {
+      checkSession();
+      if (!currentUser || currentUser.role !== 'admin') {
+        showSection('loginSection');
+        return;
+      }
+      document.getElementById('roleIndicator').innerText = 'Logged in as: Admin';
+      populateAdminTable();
+      showSection('adminSection');
+    }
+    function populateAdminTable() {
+      const students = loadUsers().filter(u => u.role === 'student');
+      const tbody = document.querySelector('#studentsTable tbody');
+      tbody.innerHTML = '';
+      students.forEach(u => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${u.full_name || ''}</td>
+          <td>${u.birthday || ''}</td>
+          <td>${u.sex || ''}</td>
+          <td>${u.grade || ''}</td>
+          <td>${u.section || ''}</td>
+          <td>${u.LRN || ''}</td>
+          <td>
+            <button onclick="adminEditStudent('${u.id}')">Edit</button>
+            <button onclick="adminDeleteStudent('${u.id}')">Delete</button>
+            <button onclick="adminAddGuidance('${u.id}')">Guidance</button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+    function adminEditStudent(studentId) {
+      if (!currentUser || currentUser.role !== 'admin') {
+        showSection('loginSection');
+        return;
+      }
+      const student = loadUsers().find(u => u.id === studentId);
+      if (!student) return;
+      document.getElementById('editStudentId').value = student.id;
+      document.getElementById('editFullName').value = student.full_name;
+      document.getElementById('editBirthday').value = student.birthday;
+      document.getElementById('editSex').value = student.sex;
+      document.getElementById('editGrade').value = student.grade;
+      document.getElementById('editSection').value = student.section;
+      document.getElementById('editLRN').value = student.LRN;
+      document.getElementById('editError').innerText = '';
+      showSection('adminEditSection');
+    }
+    function updateStudent() {
+      const studentId = document.getElementById('editStudentId').value;
+      const full_name = document.getElementById('editFullName').value.trim();
+      const birthday = document.getElementById('editBirthday').value;
+      const sex = document.getElementById('editSex').value;
+      const grade = document.getElementById('editGrade').value.trim();
+      const section = document.getElementById('editSection').value.trim();
+      const LRN = document.getElementById('editLRN').value.trim();
+      if (!full_name || !birthday || !sex || !grade || !section || !LRN) {
+        document.getElementById('editError').innerText = 'All fields are required.';
+        return;
+      }
+      let users = loadUsers();
+      const idx = users.findIndex(u => u.id === studentId);
+      if (idx === -1) {
+        document.getElementById('editError').innerText = 'Student not found.';
+        return;
+      }
+      users[idx].full_name = full_name;
+      users[idx].birthday = birthday;
+      users[idx].sex = sex;
+      users[idx].grade = grade;
+      users[idx].section = section;
+      users[idx].LRN = LRN;
+      saveUsers(users);
+      showAdminDashboard();
+    }
+    
+    function adminDeleteStudent(studentId) {
+      if (!confirm('Are you sure you want to delete this student?')) return;
+      let users = loadUsers();
+      users = users.filter(u => u.id !== studentId);
+      saveUsers(users);
+      populateAdminTable();
+    }
+    function adminAddGuidance(studentId) {
+      document.getElementById('guidanceStudentId').value = studentId;
+      document.getElementById('guidanceDetails').value = '';
+      document.getElementById('guidanceError').innerText = '';
+      showSection('adminGuidanceSection');
+    }
+    function saveGuidanceRecord() {
+      const studentId = document.getElementById('guidanceStudentId').value;
+      const details = document.getElementById('guidanceDetails').value.trim();
+      if (!details) {
+        document.getElementById('guidanceError').innerText = 'Record details required.';
+        return;
+      }
+      let records = loadGuidanceRecords();
+      records.push({
+        id: generateId(),
+        user_id: studentId,
+        record_details: details,
+        created_at: new Date().toISOString()
+      });
+      saveGuidanceRecords(records);
+      showAdminDashboard();
+    }
+    // -------------------------------
+    // UTILITIES
+    // -------------------------------
+    function generateId() {
+      return '_' + Math.random().toString(36).substr(2, 9);
+    }
+  </script>
+</body>
+</html>
